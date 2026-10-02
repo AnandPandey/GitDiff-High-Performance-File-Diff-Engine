@@ -1,73 +1,51 @@
-# GitDiff
+# GitDiff — High-Performance File Diff Engine
 
-A high-performance file diff engine implemented using the
-Myers Shortest Edit Script algorithm.
+A full-stack file comparison engine that uses the **Myers Diff Algorithm** to calculate the shortest edit script between two files and visualize the differences through an interactive web interface.
 
-## Features
+The project is designed around the same core idea used by modern version-control systems such as Git: efficiently determining which lines were **added, deleted, or unchanged** between two versions of a file.
 
-- Custom Myers Diff implementation
-- Line-level file comparison
-- Insert / Delete / Equal operations
-- File upload
-- Diff statistics
-- Line numbers
-- REST API using FastAPI
-- React frontend
-- Automated tests
-- Reconstruction testing
-- Performance benchmarking
+---
 
-## Architecture
+## 🚀 Live Demo
 
-React
-    |
-    | POST /api/diff
-    v
-FastAPI
-    |
-    v
-Myers Diff Engine
-    |
-    v
-Edit Operations
+**Frontend:**  
+https://gitdiff-frontend.onrender.com
 
-## Algorithm
+**Backend API:**  
+https://gitdiff-backend.onrender.com
 
-GitDiff implements the Myers shortest edit script algorithm.
+---
 
-The algorithm uses:
+## ✨ Features
 
-- Edit graph
-- D = number of edits
-- k = diagonal
-- V[k] = furthest x-coordinate reached
-- Snake for matching sequences
-- Trace for reconstruction
-- Backtracking to generate edit operations
+- Compare two text files
+- Paste file contents directly into the editor
+- Upload files from your computer
+- Maximum file size: **5 MB**
+- Line-by-line diff visualization
+- Shows:
+  - Lines Added
+  - Lines Deleted
+  - Lines Unchanged
+- Custom implementation of the **Myers Diff Algorithm**
+- REST API built with FastAPI
+- Interactive React frontend
+- Dockerized frontend and backend
+- Automated testing with pytest
+- GitHub Actions CI pipeline
+- Production deployment using Render
 
-## Example
+---
 
-Old:
+## 🧠 Myers Diff Algorithm
 
-hello
-world
+GitDiff uses the **Myers Diff Algorithm** instead of relying on Python's built-in `difflib` or an external diff library.
 
-New:
+The algorithm finds the **shortest edit script** required to transform the old file into the new file.
 
-hello
-beautiful world
+The possible operations are:
 
-Result:
-
- EQUAL  hello
- DELETE world
- INSERT beautiful world
-
-## Testing
-
-Run:
-
-```bash
-cd backend
-source venv/bin/activate
-python -m pytest
+```text
+equal   → line exists in both files
+insert  → line exists only in the new file
+delete  → line exists only in the old file
