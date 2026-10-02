@@ -23,6 +23,8 @@ services:
     container_name: gitdiff-frontend
     ports:
       - "5173:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       backend:
         condition: service_healthy
