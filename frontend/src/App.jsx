@@ -38,7 +38,7 @@ function App() {
     setResult(null);
 
     try {
-      const response = await fetch("/api/diff", {
+      const response = await fetch("https://gitdiff-backend.onrender.com/api/diff", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
