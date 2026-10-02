@@ -1,0 +1,34 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from api.diff_routes import router as diff_router
+
+
+app = FastAPI(
+    title="GitDiff API",
+    description="File diff engine using Myers Diff Algorithm",
+    version="1.0.0"
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "ok",
+        "service": "GitDiff API"
+    }
+
+
+app.include_router(
+    diff_router,
+    prefix="/api"
+)
