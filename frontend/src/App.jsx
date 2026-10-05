@@ -33,21 +33,29 @@ function App() {
   }
 
   async function compareFiles() {
+    if (!oldText && !newText) {
+      setError("Please provide content for both files.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setResult(null);
 
     try {
-      const response = await fetch("https://gitdiff-backend.onrender.com/api/diff", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          old_text: oldText,
-          new_text: newText,
-        }),
-      });
+      const response = await fetch(
+        "https://gitdiff-backend.onrender.com/api/diff",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            old_text: oldText,
+            new_text: newText,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to calculate diff");
@@ -57,7 +65,9 @@ function App() {
 
       setResult(data);
     } catch (err) {
-      setError(err.message);
+      setError(
+        "Could not connect to the GitDiff backend."
+      );
     }
 
     setLoading(false);
@@ -86,6 +96,8 @@ function App() {
 
       <main>
 
+        {/* FILE INPUTS */}
+
         <section className="editors">
 
           <div className="editor">
@@ -98,10 +110,14 @@ function App() {
 
               <label className="file-button">
                 Choose File
+
                 <input
                   type="file"
                   onChange={(event) =>
-                    handleFileUpload(event, setOldText)
+                    handleFileUpload(
+                      event,
+                      setOldText
+                    )
                   }
                 />
               </label>
@@ -129,10 +145,14 @@ function App() {
 
               <label className="file-button">
                 Choose File
+
                 <input
                   type="file"
                   onChange={(event) =>
-                    handleFileUpload(event, setNewText)
+                    handleFileUpload(
+                      event,
+                      setNewText
+                    )
                   }
                 />
               </label>
@@ -174,69 +194,89 @@ function App() {
 
 
         {result && (
-
           <section className="results">
 
+            {/* RESULT HEADER */}
+
             <div className="results-header">
-              <h2>Diff Results</h2>
+              <div>
+                <h2>Diff Results</h2>
+
+                <span>
+                  Line + Character Comparison
+                </span>
+              </div>
             </div>
 
+
+            {/* STATISTICS */}
 
             <div className="stats">
 
               <div>
-                <strong>{result.added}</strong>
-                <span>Lines Added</span>
+                <strong>
+                  {result.added}
+                </strong>
+
+                <span>
+                  Lines Added
+                </span>
               </div>
 
               <div>
-                <strong>{result.deleted}</strong>
-                <span>Lines Deleted</span>
+                <strong>
+                  {result.deleted}
+                </strong>
+
+                <span>
+                  Lines Deleted
+                </span>
               </div>
 
               <div>
-                <strong>{result.unchanged}</strong>
-                <span>Lines Unchanged</span>
+                <strong>
+                  {result.unchanged}
+                </strong>
+
+                <span>
+                  Lines Unchanged
+                </span>
               </div>
 
             </div>
 
 
-            <div className="diff">
+            {/* LINE LEVEL DIFF */}
 
-              {(() => {
-                let oldLine = 1;
-                let newLine = 1;
+            <section className="diff-section">
 
-                return result.operations.map(
+              <div className="section-title">
+                <h3>
+                  Line-by-Line Diff
+                </h3>
+
+                <span>
+                  Myers Line Diff
+                </span>
+              </div>
+
+              <div className="diff">
+
+                {result.line_operations.map(
                   (operation, index) => {
-                    const currentOldLine = oldLine;
-                    const currentNewLine = newLine;
-
-                    if (operation.type === "equal") {
-                      oldLine++;
-                      newLine++;
-                    } else if (operation.type === "delete") {
-                      oldLine++;
-                    } else if (operation.type === "insert") {
-                      newLine++;
-                    }
 
                     return (
                       <div
                         key={index}
                         className={`diff-line ${operation.type}`}
                       >
+
                         <span className="line-number">
-                          {operation.type === "insert"
-                            ? ""
-                            : currentOldLine}
+                          {operation.old_line_number || ""}
                         </span>
 
                         <span className="line-number">
-                          {operation.type === "delete"
-                            ? ""
-                            : currentNewLine}
+                          {operation.new_line_number || ""}
                         </span>
 
                         <span className="symbol">
@@ -247,19 +287,168 @@ function App() {
                             : " "}
                         </span>
 
-                        <span>
+                        <span className="line-content">
                           {operation.line}
                         </span>
+
                       </div>
                     );
                   }
-                );
-              })()}
+                )}
 
-            </div>
+              </div>
+
+            </section>
+
+
+            {/* CHARACTER LEVEL DIFF */}
+
+            <section className="character-section">
+
+              <div className="section-title">
+                <h3>
+                  Character-by-Character Diff
+                </h3>
+
+                <span>
+                  Myers Character Diff
+                </span>
+              </div>
+
+
+              {result.character_diffs.length === 0 && (
+                <div className="no-character-diff">
+                  No modified lines require character-level
+                  comparison.
+                </div>
+              )}
+
+
+              {result.character_diffs.map(
+                (diff, index) => {
+
+                  return (
+                    <div
+                      className="character-card"
+                      key={index}
+                    >
+
+                      <div className="character-card-header">
+
+                        <span>
+                          Line {diff.old_line_number}
+                          {" → "}
+                          Line {diff.new_line_number}
+                        </span>
+
+                      </div>
+
+
+                      <div className="character-grid">
+
+                        {/* OLD */}
+
+                        <div className="character-panel">
+
+                          <div className="character-panel-title">
+                            OLD
+                          </div>
+
+                          <div className="character-content delete-view">
+
+                            {diff.changes.map(
+                              (change, changeIndex) => {
+
+                                if (
+                                  change.type === "equal"
+                                ) {
+                                  return (
+                                    <span
+                                      key={changeIndex}
+                                    >
+                                      {change.text}
+                                    </span>
+                                  );
+                                }
+
+                                if (
+                                  change.type === "delete"
+                                ) {
+                                  return (
+                                    <span
+                                      key={changeIndex}
+                                      className="character-delete"
+                                    >
+                                      {change.text}
+                                    </span>
+                                  );
+                                }
+
+                                return null;
+                              }
+                            )}
+
+                          </div>
+
+                        </div>
+
+
+                        {/* NEW */}
+
+                        <div className="character-panel">
+
+                          <div className="character-panel-title">
+                            NEW
+                          </div>
+
+                          <div className="character-content insert-view">
+
+                            {diff.changes.map(
+                              (change, changeIndex) => {
+
+                                if (
+                                  change.type === "equal"
+                                ) {
+                                  return (
+                                    <span
+                                      key={changeIndex}
+                                    >
+                                      {change.text}
+                                    </span>
+                                  );
+                                }
+
+                                if (
+                                  change.type === "insert"
+                                ) {
+                                  return (
+                                    <span
+                                      key={changeIndex}
+                                      className="character-insert"
+                                    >
+                                      {change.text}
+                                    </span>
+                                  );
+                                }
+
+                                return null;
+                              }
+                            )}
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+                  );
+                }
+              )}
+
+            </section>
 
           </section>
-
         )}
 
       </main>
