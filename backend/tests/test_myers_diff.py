@@ -1,4 +1,51 @@
 from services.myers_diff import myers_diff
+from services.myers_diff import myers_character_diff
+
+
+def test_character_diff_equal():
+    result = myers_character_diff(
+        "hello",
+        "hello"
+    )
+
+    assert "".join(
+        character
+        for operation, character in result
+        if operation == "equal"
+    ) == "hello"
+
+
+def test_character_diff_insert():
+    result = myers_character_diff(
+        "hello",
+        "hello!"
+    )
+
+    assert ("insert", "!") in result
+
+
+def test_character_diff_delete():
+    result = myers_character_diff(
+        "hello!",
+        "hello"
+    )
+
+    assert ("delete", "!") in result
+
+
+def test_character_diff_replacement():
+    result = myers_character_diff(
+        "hello world",
+        "hello GitDiff"
+    )
+
+    types = [
+        operation
+        for operation, character in result
+    ]
+
+    assert "delete" in types
+    assert "insert" in types
 
 
 def test_identical_files():
