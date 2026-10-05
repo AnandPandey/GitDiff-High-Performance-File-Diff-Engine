@@ -518,25 +518,26 @@ button:disabled {
 }
 
 .character-content {
-  padding: 14px;
+  padding: 16px;
   min-height: 48px;
   font-family: monospace;
+  font-size: 14px;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
-.character-delete {
-  text-decoration: line-through;
-  font-weight: 700;
-  padding: 1px 3px;
-  border-radius: 3px;
+.character-delete,
+.character-insert {
+  display: inline;
 }
 
 .character-insert {
-  font-weight: 700;
-  padding: 1px 3px;
+  background: rgba(46, 160, 67, 0.35);
+  color: #56d364;
   border-radius: 3px;
+  padding: 1px 3px;
+  font-weight: 700;
 }
 
 .no-character-diff {
